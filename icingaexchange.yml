@@ -1,0 +1,18 @@
+name: check_katello_sync
+description: "file:///README.md"
+url: "https://github.com/stdevel/check_katello_sync"
+tags: Foreman,Katello,Red Hat Satellite,Compliance
+vendor: Linux
+target: Operating System
+type: Plugin
+license: gplv3
+releases: 
+  - 
+    name: 0.5.0
+    description: "0.5.0 Release"
+    files: 
+      - 
+        name: check_katello_sync.py
+        url: "file:///check_katello_sync.py"
+        description: "Release 0.5.0"
+        checksum: 32ec619d80a7a1b086552449a871eb59
