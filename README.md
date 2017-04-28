@@ -62,13 +62,13 @@ OK: Products synchronized: owncloud-el7-x86_64, katello-client-el7-x86_64, icing
 Only checking some particular products, enabling performance data:
 ```
 $ ./check_katello_sync.py -s st-katello01.stankowic.loc -a shittyrobots.auth -o Stankowic -i gitlab-ci-el7-x86_64 -P
-OK: Products synchronized: gitlab-ci-el7-x86_64 | 'prod_total'=1;;;; 'prod_warn'=0;2;2;; 'prod_crit'=0;5;5;;
+OK: Products synchronized: gitlab-ci-el7-x86_64 | 'prod_total'=9;;;; 'prod_warn'=0;2;2;; 'prod_crit'=0;5;5;;
 ```
 
 The same, specifying custom thresholds:
 ```
 $ ./check_katello_sync.py -s st-katello01.stankowic.loc -a pinkepank.auth -o Stankowic -i gitlab-ci-el7-x86_64 -P -w 2 -c 4
-OK: Products synchronized: gitlab-ci-el7-x86_64 | 'prod_total'=1;;;; 'prod_warn'=0;2;2;; 'prod_crit'=0;4;4;;
+OK: Products synchronized: gitlab-ci-el7-x86_64 | 'prod_total'=9;;;; 'prod_warn'=0;2;2;; 'prod_crit'=0;4;4;;
 ```
 
 # Installation
