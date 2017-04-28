@@ -15,4 +15,4 @@ releases:
         name: check_katello_sync.py
         url: "file:///check_katello_sync.py"
         description: "Release 0.5.0"
-        checksum: 32ec619d80a7a1b086552449a871eb59
+        checksum: 1e2c195952086a6414d6737ba3812687

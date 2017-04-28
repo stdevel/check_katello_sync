@@ -45,6 +45,10 @@ PROD_OK = []
 """
 list: okay products
 """
+PROD_TOTAL = 0
+"""
+int: total products
+"""
 
 
 
@@ -123,6 +127,8 @@ def check_products():
     """
     Checks products for currency.
     """
+    global PROD_TOTAL
+
     #get API result
     result_obj = json.loads(
         FOREMAN_CLIENT.api_get(
@@ -131,6 +137,7 @@ def check_products():
     )
     #check _all_ the products
     for product in result_obj["results"]:
+        PROD_TOTAL = PROD_TOTAL + 1
         if len(options.include) > 0:
             if product["label"] in options.include:
                 check_product(product)
@@ -172,11 +179,10 @@ def check_products():
     #perfdata
     perfdata = "|"
     if options.show_perfdata:
-        prod_total = len(PROD_OK) + len(PROD_WARN) + len(PROD_CRIT)
         perfdata = "{0} 'prod_total'={1};;;; " \
             "'prod_warn'={2};{3};{3};; " \
             "'prod_crit'={4};{5};{5};; ".format(
-                perfdata, prod_total,
+                perfdata, PROD_TOTAL,
                 len(PROD_WARN), options.outdated_warn,
                 len(PROD_CRIT), options.outdated_crit,
             )
