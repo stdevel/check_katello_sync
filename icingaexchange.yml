@@ -8,11 +8,11 @@ type: Plugin
 license: gplv3
 releases: 
   - 
-    name: 0.5.0
-    description: "0.5.0 Release"
+    name: 0.5.1
+    description: "0.5.1 Release"
     files: 
       - 
         name: check_katello_sync.py
         url: "file:///check_katello_sync.py"
-        description: "Release 0.5.0"
-        checksum: 1e2c195952086a6414d6737ba3812687
+        description: "Release 0.5.1"
+        checksum: f808eb89eecb8129bfa96502684b32c9

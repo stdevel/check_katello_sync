@@ -17,7 +17,7 @@ import getpass
 from ForemanAPIClient import ForemanAPIClient
 from datetime import datetime
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 """
 str: Program version
 """
@@ -283,6 +283,9 @@ def parse_options(args=None):
     #-s / --server
     fman_opts.add_argument("-s", "--server", dest="server", metavar="SERVER", \
     default="localhost", help="defines the server to use (default: localhost)")
+    #--insecure
+    fman_opts.add_argument("--insecure", dest="ssl_verify", default=True, \
+    action="store_false", help="Disables SSL verification (default: no)")
     #-o / --organization
     fman_opts.add_argument("-o", "--organization", dest="org", \
     action="store", default="", metavar="NAME|ID", help="specifies the " \
@@ -324,7 +327,7 @@ def main(options):
     #define client
     (fman_user, fman_pass) = get_credentials("Satellite", options.authfile)
     FOREMAN_CLIENT = ForemanAPIClient(
-        options.server, fman_user, fman_pass, "/katello"
+        options.server, fman_user, fman_pass, options.ssl_verify, "/katello"
     )
 
     #get organization ID if string supplied
