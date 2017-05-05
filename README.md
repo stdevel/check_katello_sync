@@ -38,6 +38,7 @@ The following parameters can be specified:
 | `-P` / `--show-perfdata` | enables performance data (*default: no*) |
 | `-a` / `--authfile` | defines an auth file to use instead of shell variables |
 | `-s` / `--server` | defines the server to use (*default: localhost*) |
+| `--insecure` | Disables SSL verification (*default: no*) |
 | `-o` / `--organization` | specifies the organization to check (*name or ID*) |
 | `-w` / `--outdated-warning` | defines outdated products warning threshold in days (*default: 2*) |
 | `-c` / `--outdated-critical` | defines outdated products critical threshold in days (*default: 5*) |
