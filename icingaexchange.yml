@@ -16,3 +16,8 @@ releases:
         url: "file:///check_katello_sync.py"
         description: "Release 0.5.1"
         checksum: f808eb89eecb8129bfa96502684b32c9
+      - 
+        name: ForemanAPIClient.py
+        url: "file:///ForemanAPIClient.py"
+        description: "Release 0.5.1"
+        checksum: b65efb6f1027e5ddb573718395e5ef0b
