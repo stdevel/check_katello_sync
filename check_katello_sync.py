@@ -100,10 +100,10 @@ def check_product(product):
         set_code(2)
     else:
         LOGGER.debug("Product '{0}' ({1}) was synced at {2}".format(
-            product["label"], product["description"], product["last_sync"]
+            product["label"], product["description"], product["last_sync"][0:19]
         ))
         last_sync = datetime.strptime(
-            product["last_sync"], "%Y-%m-%d %H:%M:%S UTC"
+            product["last_sync"][0:19], "%Y-%m-%d %H:%M:%S"
         )
         delta = datetime.now() - last_sync
         LOGGER.debug("Delta for '{0}' is {1} days".format(
@@ -320,6 +320,12 @@ def parse_options(args=None):
 def main(options):
     """Main function, starts the logic based on parameters."""
     global FOREMAN_CLIENT
+
+    #splitting is fun
+    if len(options.include) == 1:
+        options.include = options.include[0].split(',')
+    if len(options.exclude) == 1:
+        options.exclude = options.exclude[0].split(',')
 
     LOGGER.debug("Options: {0}".format(options))
     LOGGER.debug("Arguments: {0}".format(args))
