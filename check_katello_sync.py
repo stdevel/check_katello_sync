@@ -17,7 +17,7 @@ import getpass
 from ForemanAPIClient import ForemanAPIClient
 from datetime import datetime
 
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 """
 str: Program version
 """
@@ -135,6 +135,13 @@ def check_products():
             "/products?organization_id={}".format(options.org)
         )
     )
+
+    #check for non-existing products
+    for product in options.include:
+        if product not in [x["label"] for x in result_obj["results"]]:
+            PROD_CRIT.append(product)
+            set_code(2)
+
     #check _all_ the products
     for product in result_obj["results"]:
         PROD_TOTAL = PROD_TOTAL + 1
@@ -152,7 +159,7 @@ def check_products():
     #critical products
     str_crit = ", ".join(PROD_CRIT)
     if len(PROD_CRIT) >= 1:
-        str_crit = "Products outdated more than {0} days: {1}".format(
+        str_crit = "Products non-existent or outdated more than {0} days: {1}".format(
             options.outdated_crit, str_crit)
         if len(PROD_WARN) >= 1 or len(PROD_OK) >= 1:
             str_crit = "{0}. ".format(str_crit)
