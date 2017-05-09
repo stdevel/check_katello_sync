@@ -17,7 +17,7 @@ import getpass
 from ForemanAPIClient import ForemanAPIClient
 from datetime import datetime
 
-__version__ = "0.5.2"
+__version__ = "0.5.3"
 """
 str: Program version
 """
@@ -91,7 +91,7 @@ def check_product(product):
     """
     global PROD_OK, PROD_WARN, PROD_CRIT
 
-    #Check if product unsynced
+    #check if product unsynced
     if product["last_sync"] == None:
         LOGGER.debug("Product '{0}' ({1}) is UNSYNCED!".format(
             product["label"], product["description"]
@@ -132,7 +132,7 @@ def check_products():
     #get API result
     result_obj = json.loads(
         FOREMAN_CLIENT.api_get(
-            "/products?organization_id={}".format(options.org)
+            "/products?organization_id={}&per_page=1337".format(options.org)
         )
     )
 
@@ -143,7 +143,7 @@ def check_products():
             set_code(2)
 
     #check _all_ the products
-    for product in result_obj["results"]:
+    for product in [x for x in result_obj["results"] if x["repository_count"] > 0]:
         PROD_TOTAL = PROD_TOTAL + 1
         if len(options.include) > 0:
             if product["label"] in options.include:
