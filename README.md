@@ -16,7 +16,7 @@ $ HISTFILE="" SATELLITE_LOGIN=mylogin SATELLITE_PASSWORD=mypass ./check_katello_
 ```
 
 ## Using an authfile
-A better possibility is to create a authfile with permisions **0600**. Just enter the username in the first line and the password in the second line and hand the path to the script:
+A better possibility is to create a authfile with permisions **0600** or **0400**. Just enter the username in the first line and the password in the second line and hand the path to the script:
 ```
 $ ./check_katello_sync.py -a giertz.auth -S giertz.stankowic.loc
 ```
@@ -51,7 +51,7 @@ The following example checks all products of an particular organization on a For
 $ ./check_katello_sync.py -s st-katello01.stankowic.loc -o Stankowic
 Satellite Username: admin
 Satellite Password:
-CRITICAL: Products outdated more than 5 days: Stankowic_Puppet, Stankowic_Docker. Products outdated up to 2 days: Stankowic_Docker. Products synchronized: owncloud-el7-x86_64, katello-client-el7-x86_64, icinga2-el7-x86_64, grafana-el7-x86_64, gitlab-ci-el7-x86_64, EPEL_7_x86_64, CentOS_7_x86_64 |
+CRITICAL: Products outdated more than 5 days: Stankowic_Puppet. Products outdated up to 2 days: Stankowic_Docker. Products synchronized: owncloud-el7-x86_64, katello-client-el7-x86_64, icinga2-el7-x86_64, grafana-el7-x86_64, gitlab-ci-el7-x86_64, EPEL_7_x86_64, CentOS_7_x86_64 |
 ```
 
 Ignoring some products synchronized manually, authentication using authfile:
@@ -99,7 +99,7 @@ object Host "st-katello01.stankowic.loc" {
   vars.katello_organization = "Stankowic"
 ```
 
-The authfile needs to have file permissions **0600** and should be owned by the ``icinga`` user:
+The authfile needs to have file permissions **0600** or **0400** and should be owned by the ``icinga`` user:
 ```
 # chmod 0600 /usr/lib64/nagios/plugins/katello.auth
 # chown icinga: /usr/lib64/nagios/plugins/katello.auth
