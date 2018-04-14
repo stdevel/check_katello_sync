@@ -17,7 +17,7 @@ import getpass
 from ForemanAPIClient import ForemanAPIClient
 from datetime import datetime
 
-__version__ = "0.5.3"
+__version__ = "0.5.4"
 """
 str: Program version
 """
