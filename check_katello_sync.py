@@ -113,7 +113,7 @@ def check_product(product):
             PROD_CRIT.append(product["label"])
             set_code(2)
             LOGGER.debug("Critical product: '{0}'".format(product["label"]))
-        if delta.days > options.outdated_warn:
+        elif delta.days > options.outdated_warn:
             PROD_WARN.append(product["label"])
             set_code(1)
             LOGGER.debug("Warning product: '{0}'".format(product["label"]))
@@ -217,17 +217,17 @@ def get_credentials(prefix, input_file=None):
         try:
             #check filemode and read file
             filemode = oct(stat.S_IMODE(os.lstat(input_file).st_mode))
-            if filemode == "0600":
-                LOGGER.debug("File permission matches 0600")
+            if filemode == "0600" or filemode == "0400":
+                LOGGER.debug("File permission matches 0600 or 0400")
                 with open(input_file, "r") as auth_file:
                     s_username = auth_file.readline().replace("\n", "")
                     s_password = auth_file.readline().replace("\n", "")
                 return (s_username, s_password)
             else:
                 LOGGER.warning("File permissions (" + filemode + ")" \
-                    " not matching 0600!")
+                    " not matching 0600 or 0400!")
         except OSError:
-            LOGGER.warning("File non-existent or permissions not 0600!")
+            LOGGER.warning("File non-existent or permissions not 0600 or 0400!")
             LOGGER.debug("Prompting for {} login credentials as we have a" \
                 " faulty file".format(prefix))
             s_username = raw_input(prefix + " Username: ")
@@ -256,7 +256,7 @@ def parse_options(args=None):
     Login credentials are assigned using the following shell variables:
     SATELLITE_LOGIN  username
     SATELLITE_PASSWORD  password
-    It is also possible to create an authfile (permissions 0600) for usage
+    It is also possible to create an authfile (permissions 0600 or 0400) for usage
     with this script. The first line needs to contain the username, the
     second line should consist of the appropriate password. If you're not
     defining variables or an authfile you will be prompted to enter your
