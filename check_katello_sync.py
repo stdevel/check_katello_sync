@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 A Nagios/Icinga plugin for checking product synchronization
@@ -169,7 +169,7 @@ def check_products():
     #warning products
     str_warn = ", ".join(PROD_WARN)
     if len(PROD_WARN) >= 1:
-        str_warn = "Products outdated up to {0} days: {1}".format(
+        str_warn = "Products outdated up to {0} days: {1}".format(
             options.outdated_warn, str_warn)
         if len(PROD_OK) >= 1:
             str_warn = "{0}. ".format(str_warn)
@@ -199,7 +199,7 @@ def check_products():
         str_crit, str_warn, str_ok, perfdata
     )
     #print result and die in a fire
-    print "{0}: {1}".format(get_return_str(), output)
+    print("{0}: {1}".format(get_return_str(), output))
     exit(STATE)
 
 
@@ -217,6 +217,8 @@ def get_credentials(prefix, input_file=None):
         try:
             #check filemode and read file
             filemode = oct(stat.S_IMODE(os.lstat(input_file).st_mode))
+            #filemode is e.g. "0o644" right now. Remove 'o' for comparison.
+            filemode = filemode.replace("o", "")
             if filemode == "0600" or filemode == "0400":
                 LOGGER.debug("File permission matches 0600 or 0400")
                 with open(input_file, "r") as auth_file:
@@ -230,7 +232,7 @@ def get_credentials(prefix, input_file=None):
             LOGGER.warning("File non-existent or permissions not 0600 or 0400!")
             LOGGER.debug("Prompting for {} login credentials as we have a" \
                 " faulty file".format(prefix))
-            s_username = raw_input(prefix + " Username: ")
+            s_username = input(prefix + " Username: ")
             s_password = getpass.getpass(prefix + " Password: ")
             return (s_username, s_password)
     elif prefix.upper()+"_LOGIN" in os.environ and \
@@ -242,7 +244,7 @@ def get_credentials(prefix, input_file=None):
     else:
         #prompt user
         LOGGER.debug("Prompting for {} login credentials".format(prefix))
-        s_username = raw_input(prefix + " Username: ")
+        s_username = input(prefix + " Username: ")
         s_password = getpass.getpass(prefix + " Password: ")
         return (s_username, s_password)
 
@@ -264,8 +266,11 @@ def parse_options(args=None):
     '''
     epilog = '''Check-out the website for more details:
     http://github.com/stdevel/check_katello_sync'''
-    parser = argparse.ArgumentParser(description=desc, version=__version__, \
+    parser = argparse.ArgumentParser(description=desc, \
     epilog=epilog)
+
+    #move version here to fit current python 3 argparse
+    parser.add_argument('--version', action='version', version=__version__)
 
     #define option groups
     gen_opts = parser.add_argument_group("generic arguments")
