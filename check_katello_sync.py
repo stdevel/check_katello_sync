@@ -93,33 +93,39 @@ def check_product(product):
     """
     # check if product unsynced
     if product["last_sync"] is None:
-        LOGGER.debug("Product '{0}' ({1}) is UNSYNCED!".format(
-            product["label"], product["description"]
-        ))
+        LOGGER.debug(
+            "Product '%s' (%s) is UNSYNCED!",
+            product['label'], product['description']
+        )
         PROD_CRIT.append(product["label"])
         set_code(2)
     else:
-        LOGGER.debug("Product '{0}' ({1}) was synced at {2}".format(
-            product["label"], product["description"], product["last_sync"][0:19]
-        ))
+        LOGGER.debug(
+            "Product '%s' (%s) was synced at %s",
+            product['label'], product['description'],
+            product['last_sync'][0:19]
+        )
         last_sync = datetime.strptime(
             product["last_sync"][0:19], "%Y-%m-%d %H:%M:%S"
         )
         delta = datetime.now() - last_sync
-        LOGGER.debug("Delta for '{0}' is {1} days".format(
-            product["label"], delta.days
-        ))
+        LOGGER.debug(
+            "Delta for '%s' is %s days",
+            product['label'], delta.days
+        )
         if delta.days > options.outdated_crit:
             PROD_CRIT.append(product["label"])
             set_code(2)
-            LOGGER.debug("Critical product: '{0}'".format(product["label"]))
+            LOGGER.debug(
+                "Critical product: '%s'", product['label']
+            )
         elif delta.days > options.outdated_warn:
             PROD_WARN.append(product["label"])
             set_code(1)
-            LOGGER.debug("Warning product: '{0}'".format(product["label"]))
+            LOGGER.debug("Warning product: '%s'", product['label'])
         else:
             PROD_OK.append(product["label"])
-            LOGGER.debug("Ok product: '{0}'".format(product["label"]))
+            LOGGER.debug("Ok product: '%s'", product['label'])
 
 
 
@@ -132,7 +138,7 @@ def check_products():
     # get API result
     result_obj = json.loads(
         FOREMAN_CLIENT.api_get(
-            "/products?organization_id={}&per_page=1337".format(options.org)
+            f"/products?organization_id={options.org}&per_page=1337"
         )
     )
 
@@ -159,47 +165,39 @@ def check_products():
     # critical products
     str_crit = ", ".join(PROD_CRIT)
     if len(PROD_CRIT) >= 1:
-        str_crit = "Products non-existent or outdated more than {0} days: {1}".format(
-            options.outdated_crit, str_crit)
+        str_crit = f"Products non-existent or outdated more than {options.outdated_crit} days: {str_crit}"
         if len(PROD_WARN) >= 1 or len(PROD_OK) >= 1:
-            str_crit = "{0}. ".format(str_crit)
+            str_crit = f"{str_crit}. "
     else:
         str_crit = ""
 
     # warning products
     str_warn = ", ".join(PROD_WARN)
     if len(PROD_WARN) >= 1:
-        str_warn = "Products outdated up to {0} days: {1}".format(
-            options.outdated_warn, str_warn)
+        str_warn = f"Products outdated up to {options.outdated_warn} days: {str_warn}"
         if len(PROD_OK) >= 1:
-            str_warn = "{0}. ".format(str_warn)
+            str_warn = f"{str_warn}. "
     else:
         str_warn = ""
 
     # ok products
     str_ok = ", ".join(PROD_OK)
     if len(PROD_OK) >= 1:
-        str_ok = "Products synchronized: {0}".format(str_ok)
+        str_ok = f"Products synchronized: {str_ok}"
     else:
         str_ok = ""
 
     # perfdata
     perfdata = "|"
     if options.show_perfdata:
-        perfdata = "{0} 'prod_total'={1};;;; " \
-            "'prod_warn'={2};{3};{3};; " \
-            "'prod_crit'={4};{5};{5};; ".format(
-                perfdata, PROD_TOTAL,
-                len(PROD_WARN), options.outdated_warn,
-                len(PROD_CRIT), options.outdated_crit,
-            )
+        perfdata = f"{perfdata} 'prod_total'={PROD_TOTAL};;;; " \
+            f"'prod_warn'={len(PROD_WARN)};{options.outdated_warn};{options.outdated_warn};; " \
+            f"'prod_crit'={len(PROD_CRIT)};{options.outdated_crit};{options.outdated_crit};; "
 
     # final string
-    output = "{0}{1}{2} {3} ".format(
-        str_crit, str_warn, str_ok, perfdata
-    )
+    output = f"{str_crit}{str_warn}{str_ok} {perfdata} "
     # print result and die in a fire
-    print("{0}: {1}".format(get_return_str(), output))
+    print(f"{get_return_str()}: {output}")
     sys.exit(STATE)
 
 
@@ -226,24 +224,24 @@ def get_credentials(prefix, input_file=None):
                     s_password = auth_file.readline().replace("\n", "")
                 return (s_username, s_password)
             else:
-                LOGGER.warning("File permissions (" + filemode + ")" \
+                LOGGER.warning("File permissions ({filemode})" \
                     " not matching 0600 or 0400!")
         except OSError:
             LOGGER.warning("File non-existent or permissions not 0600 or 0400!")
-            LOGGER.debug("Prompting for {} login credentials as we have a" \
-                " faulty file".format(prefix))
+            LOGGER.debug("Prompting for %s login credentials as we have a" \
+                " faulty file", prefix)
             s_username = input(prefix + " Username: ")
             s_password = getpass.getpass(prefix + " Password: ")
             return (s_username, s_password)
     elif prefix.upper()+"_LOGIN" in os.environ and \
         prefix.upper()+"_PASSWORD" in os.environ:
         # shell variables
-        LOGGER.debug("Checking {} shell variables".format(prefix))
+        LOGGER.debug("Checking %s shell variables", prefix)
         return (os.environ[prefix.upper()+"_LOGIN"], \
             os.environ[prefix.upper()+"_PASSWORD"])
     else:
         # prompt user
-        LOGGER.debug("Prompting for {} login credentials".format(prefix))
+        LOGGER.debug("Prompting for %s login credentials", prefix)
         s_username = input(prefix + " Username: ")
         s_password = getpass.getpass(prefix + " Password: ")
         return (s_username, s_password)
@@ -343,8 +341,8 @@ def main(options):
     if len(options.exclude) == 1:
         options.exclude = options.exclude[0].split(',')
 
-    LOGGER.debug("Options: {0}".format(options))
-    LOGGER.debug("Arguments: {0}".format(args))
+    LOGGER.debug("Options: %s", options)
+    LOGGER.debug("Arguments: %s", args)
 
     # define client
     (fman_user, fman_pass) = get_credentials("Satellite", options.authfile)
