@@ -165,7 +165,8 @@ def check_products():
     # critical products
     str_crit = ", ".join(PROD_CRIT)
     if len(PROD_CRIT) >= 1:
-        str_crit = f"Products non-existent or outdated more than {options.outdated_crit} days: {str_crit}"
+        str_crit = f"Products non-existent or outdated more " \
+            f"than {options.outdated_crit} days: {str_crit}"
         if len(PROD_WARN) >= 1 or len(PROD_OK) >= 1:
             str_crit = f"{str_crit}. "
     else:
