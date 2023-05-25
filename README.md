@@ -12,13 +12,13 @@ The following shell variables are used:
 
 You might also want to set the HISTFILE variable (*depending on your shell*) to hide the command including the password in the history:
 ```
-$ HISTFILE="" SATELLITE_LOGIN=mylogin SATELLITE_PASSWORD=mypass ./check_katello_sync.py -S giertz.stankowic.loc
+$ HISTFILE="" SATELLITE_LOGIN=mylogin SATELLITE_PASSWORD=mypass ./check_katello_sync.py -s giertz.stankowic.loc
 ```
 
 ## Using an authfile
 A better possibility is to create a authfile with permisions **0600** or **0400**. Just enter the username in the first line and the password in the second line and hand the path to the script:
 ```
-$ ./check_katello_sync.py -a giertz.auth -S giertz.stankowic.loc
+$ ./check_katello_sync.py -a giertz.auth -s giertz.stankowic.loc
 ```
 
 # Requirements
