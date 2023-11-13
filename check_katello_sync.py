@@ -92,6 +92,16 @@ def check_product(product):
     :param product: Product dictionary
     :type product: dict
     """
+    if options.state_check:
+        sync_state = product.get("sync_state")
+        if not sync_state or "complete" not in sync_state.lower():
+            LOGGER.debug("Product '%s' (%s) has unsynced state!",
+                product["label"], (product["description"] or '')
+            )
+            PROD_CRIT.append(product["label"])
+            set_code(2)
+            return
+
     # check if product unsynced
     if product["last_sync"] is None:
         LOGGER.debug(
@@ -332,6 +342,10 @@ def parse_options(args=None):
     prod_opts.add_argument("-c", "--outdated-critical", dest="outdated_crit", \
     default=5, metavar="DAYS", type=int, help="defines outdated products" \
     " critical threshold in days (default: 5)")
+    # --state-check
+    prod_opts.add_argument("--state-check", dest="state_check", \
+    default=False, action="store_true", \
+    help="Check for unsynced status using sync_state field")
 
     # PRODUCT FILTER ARGUMENTS
     # -o / --organization
