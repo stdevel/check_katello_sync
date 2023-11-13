@@ -15,6 +15,7 @@ import stat
 import json
 import datetime
 import getpass
+import fnmatch
 from datetime import datetime
 from ForemanAPIClient import ForemanAPIClient
 
@@ -142,20 +143,26 @@ def check_products():
         )
     )
 
-    # check for non-existing products
-    for product in options.include:
-        if product not in [x["label"] for x in result_obj["results"]]:
-            PROD_CRIT.append(product)
+    # check if patterns have at least one match
+    all_product_labels = [x["label"] for x in result_obj["results"]]
+    for pattern in options.include:
+        matching_products = fnmatch.filter(all_product_labels, pattern)
+        if not matching_products:
+            PROD_CRIT.append(pattern)
             set_code(2)
 
     # check _all_ the products
     for product in [x for x in result_obj["results"] if x["repository_count"] > 0]:
         PROD_TOTAL = PROD_TOTAL + 1
         if len(options.include) > 0:
-            if product["label"] in options.include:
+            matching_include_patterns = [
+                x for x in options.include if fnmatch.fnmatch(product["label"], x)]
+            if matching_include_patterns:  # if min one include pattern matches
                 check_product(product)
         elif len(options.exclude) > 0:
-            if product["label"] not in options.exclude:
+            matching_exclude_patterns = [
+                x for x in options.exclude if fnmatch.fnmatch(product["label"], x)]
+            if not matching_exclude_patterns:  # if no exclude pattern matches
                 check_product(product)
         else:
             check_product(product)
