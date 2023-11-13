@@ -198,7 +198,10 @@ def check_products():
     # final string
     output = f"{str_crit}{str_warn}{str_ok} {perfdata} "
     # print result and die in a fire
-    print(f"{get_return_str()}: {output}")
+    if options.short_output or (options.short_ok_output and not STATE):
+        print(get_return_str())
+    else:
+        print(f"{get_return_str()}: {output}")
     sys.exit(STATE)
 
 
@@ -288,6 +291,15 @@ def parse_options(args=None):
     gen_opts.add_argument("-P", "--show-perfdata", dest="show_perfdata", \
     default=False, action="store_true", \
     help="enables performance data (default: no)")
+    # -S / --short
+    gen_opts.add_argument("-S", "--short", dest="short_output", \
+    default=False, action="store_true", \
+    help="only outputs status (default: no)")
+    # --short-ok
+    gen_opts.add_argument("--short-ok", dest="short_ok_output", \
+    default=False, action="store_true", \
+    help="only outputs products if any are not ok (default: no)"
+    )
 
     # FOREMAN ARGUMENTS
     # -a / --authfile
