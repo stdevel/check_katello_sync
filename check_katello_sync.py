@@ -15,6 +15,7 @@ import stat
 import json
 import datetime
 import getpass
+import fnmatch
 from datetime import datetime
 from ForemanAPIClient import ForemanAPIClient
 
@@ -91,6 +92,16 @@ def check_product(product):
     :param product: Product dictionary
     :type product: dict
     """
+    if options.state_check:
+        sync_state = product.get("sync_state")
+        if not sync_state or "complete" not in sync_state.lower():
+            LOGGER.debug("Product '%s' (%s) has unsynced state!",
+                product["label"], (product["description"] or '')
+            )
+            PROD_CRIT.append(product["label"])
+            set_code(2)
+            return
+
     # check if product unsynced
     if product["last_sync"] is None:
         LOGGER.debug(
@@ -136,26 +147,33 @@ def check_products():
     global PROD_TOTAL
 
     # get API result
+    api_params = {"organization_id": options.org}
     result_obj = json.loads(
         FOREMAN_CLIENT.api_get(
-            f"/products?organization_id={options.org}&per_page=1337"
+            "/products", params=api_params
         )
     )
 
-    # check for non-existing products
-    for product in options.include:
-        if product not in [x["label"] for x in result_obj["results"]]:
-            PROD_CRIT.append(product)
+    # check if patterns have at least one match
+    all_product_labels = [x["label"] for x in result_obj["results"]]
+    for pattern in options.include:
+        matching_products = fnmatch.filter(all_product_labels, pattern)
+        if not matching_products:
+            PROD_CRIT.append(pattern)
             set_code(2)
 
     # check _all_ the products
     for product in [x for x in result_obj["results"] if x["repository_count"] > 0]:
         PROD_TOTAL = PROD_TOTAL + 1
         if len(options.include) > 0:
-            if product["label"] in options.include:
+            matching_include_patterns = [
+                x for x in options.include if fnmatch.fnmatch(product["label"], x)]
+            if matching_include_patterns:  # if min one include pattern matches
                 check_product(product)
         elif len(options.exclude) > 0:
-            if product["label"] not in options.exclude:
+            matching_exclude_patterns = [
+                x for x in options.exclude if fnmatch.fnmatch(product["label"], x)]
+            if not matching_exclude_patterns:  # if no exclude pattern matches
                 check_product(product)
         else:
             check_product(product)
@@ -198,7 +216,10 @@ def check_products():
     # final string
     output = f"{str_crit}{str_warn}{str_ok} {perfdata} "
     # print result and die in a fire
-    print(f"{get_return_str()}: {output}")
+    if options.short_output or (options.short_ok_output and not STATE):
+        print(get_return_str())
+    else:
+        print(f"{get_return_str()}: {output}")
     sys.exit(STATE)
 
 
@@ -288,6 +309,15 @@ def parse_options(args=None):
     gen_opts.add_argument("-P", "--show-perfdata", dest="show_perfdata", \
     default=False, action="store_true", \
     help="enables performance data (default: no)")
+    # -S / --short
+    gen_opts.add_argument("-S", "--short", dest="short_output", \
+    default=False, action="store_true", \
+    help="only outputs status (default: no)")
+    # --short-ok
+    gen_opts.add_argument("--short-ok", dest="short_ok_output", \
+    default=False, action="store_true", \
+    help="only outputs products if any are not ok (default: no)"
+    )
 
     # FOREMAN ARGUMENTS
     # -a / --authfile
@@ -312,6 +342,10 @@ def parse_options(args=None):
     prod_opts.add_argument("-c", "--outdated-critical", dest="outdated_crit", \
     default=5, metavar="DAYS", type=int, help="defines outdated products" \
     " critical threshold in days (default: 5)")
+    # --state-check
+    prod_opts.add_argument("--state-check", dest="state_check", \
+    default=False, action="store_true", \
+    help="Check for unsynced status using sync_state field")
 
     # PRODUCT FILTER ARGUMENTS
     # -o / --organization
