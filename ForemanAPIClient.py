@@ -97,7 +97,7 @@ class ForemanAPIClient:
 
 
     #TODO: find a nicer way to displaying _all_ the hits...
-    def __api_request(self, method, sub_url, payload="", hits=1337, page=1):
+    def __api_request(self, method, sub_url, payload="", params={}, hits=-1, page=1):
         """
         Sends a HTTP request to the Foreman API. This function requires
         a valid HTTP method and a sub-URL (such as /hosts). Optionally,
@@ -111,9 +111,11 @@ class ForemanAPIClient:
         :type sub_url: str
         :param payload: payload for POST/PUT requests
         :type payload: str
-        :param hits: numbers of hits/page for GET requests (must be set sadly)
+        :param params: parameters for GET request
+        :type params: dict
+        :param hits: numbers of hits/page for GET requests
         :type hits: int
-        :param page: number of page/results to display (must be set sadly)
+        :param page: number of page/results to display
         :type page: int
 
 .. todo:: Find a nicer way to display all hits, we shouldn't use 1337 hits/page
@@ -135,6 +137,12 @@ class ForemanAPIClient:
                 #add special headers for non-GETs
                 my_headers["Content-Type"] = "application/json"
                 my_headers["Accept"] = "application/json,version=2"
+
+            if hits > 0:
+                params["per_page"] = hits
+                params["page"] = page
+            else: 
+                params['full_result'] = 'true'
 
             #send request
             if method.lower() == "put":
@@ -158,9 +166,8 @@ class ForemanAPIClient:
             else:
                 #GET
                 result = self.SESSION.get(
-                    "{}{}?per_page={}&page={}".format(
-                        self.URL, sub_url, hits, page),
-                    headers=self.HEADERS, verify=self.VERIFY
+                    "{}{}".format(self.URL, sub_url),
+                    headers=self.HEADERS, verify=self.VERIFY, params=params
                 )
             if "unable to authenticate" in result.text.lower():
                 raise ValueError("Unable to authenticate")
@@ -179,7 +186,7 @@ class ForemanAPIClient:
             pass
 
     #Aliases
-    def api_get(self, sub_url, hits=1337, page=1):
+    def api_get(self, sub_url, params={}, hits=-1, page=1):
         """
         Sends a GET request to the Foreman API. This function requires a
         sub-URL (such as /hosts) and - optionally - hits/page and page
@@ -187,12 +194,14 @@ class ForemanAPIClient:
 
         :param sub_url: relative path within the API tree (e.g. /hosts)
         :type sub_url: str
+        :param params: parameters for GET request
+        :type params: dict 
         :param hits: numbers of hits/page for GET requests (must be set sadly)
         :type hits: int
         :param page: number of page/results to display (must be set sadly)
         :type page: int
         """
-        return self.__api_request("get", sub_url, "", hits, page)
+        return self.__api_request("get", sub_url, payload="", params=params, hits=hits, page=page)
 
     def api_post(self, sub_url, payload):
         """

@@ -137,9 +137,10 @@ def check_products():
     global PROD_TOTAL
 
     # get API result
+    api_params = {"organization_id": options.org}
     result_obj = json.loads(
         FOREMAN_CLIENT.api_get(
-            f"/products?organization_id={options.org}&per_page=1337"
+            "/products", params=api_params
         )
     )
 
