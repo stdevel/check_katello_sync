@@ -22,7 +22,7 @@ $ ./check_katello_sync.py -a giertz.auth -s giertz.stankowic.loc
 ```
 
 # Requirements
-The plugin requires Python 2.6 or newer - it also requires the `requests` and `simplejson` modules.
+The plugin requires Python 3.6 or newer - it also requires the `requests` and `simplejson` modules.
 The plugin requires API version 2 - the script checks the API version and aborts if you are using a historic version of Foreman/Katello.
 
 # Usage
